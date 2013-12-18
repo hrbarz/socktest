@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>test 1</title>
+</head>
+<body>
+<script type="text/javascript" src="http://codeorigin.jquery.com/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://www.firebase.com/css/example.css">
+
+
+
+<div id='messagesDiv'></div>
+<input type='text' id='nameInput' placeholder='Name'>
+<input type='text' id='messageInput' placeholder='Message...'>
+
+<script>
+
+var data_current = {
+	url: document.URL,
+	useragent: navigator.userAgent,
+	language: navigator.language
+}
+
+var initSocket = function(){
+  var socket = io.connect();
+
+  socket.on('init',function(connection){
+
+  		console.log('Conectando a:' + connection.to);
+
+  		var priv = io.connect('/' + connection.to);
+
+  		priv.on('session', function (session) {
+	    	priv.emit('data_current',data_current);
+	    });
+
+
+  		$('#messageInput').keypress(function(e){
+
+  			if (e.keyCode == 13){
+  			
+	  			priv.emit('comment', $('#messageInput').val());
+	  			
+	  			$('<div/>').text($('#messageInput').val()).prepend($('<em/>').text('Me: ')).appendTo($('#messagesDiv'));
+
+	  			$('#messageInput').val('');
+	
+
+  			}
+
+  		});
+
+
+  });
+
+ }
+
+$.get( "/test",initSocket);
+
+</script>
+
+
+</body>
+</html>
